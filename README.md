@@ -2,7 +2,7 @@
 
 ## How to start?
 
-- Clone project from Gitlab
+- Clone project from Github
 
 - Make sure your environment has been installed Docker
 
