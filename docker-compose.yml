@@ -1,0 +1,67 @@
+version: '3.9'
+
+services:
+
+  frontend:
+    restart: always
+    build: 
+      context: .
+      dockerfile: .docker/frontend/Dockerfile
+    volumes:
+      - ./src/frontend:/usr/src/nuxt-frontend
+      - /usr/src/nuxt-frontend/.nuxt
+      - /usr/src/nuxt-frontend/node_modules
+    ports:
+      - '8881:8881' 
+
+
+  backend:
+    restart: always 
+    build: 
+      context: .
+      dockerfile: .docker/backend/Dockerfile
+    volumes:
+      - ./src/backend:/usr/src/nuxt-backend
+      - /usr/src/nuxt-backend/.nuxt
+      - /usr/src/nuxt-backend/node_modules
+    ports:
+      - '8882:8882'
+
+  api:
+    restart: always
+    build:
+      context: .
+      dockerfile: .docker/api/Dockerfile
+    ports:
+      - '8883:80'
+    volumes:
+      - ./src/api:/var/www/html:cached
+      - /var/www/html/node_modules
+      - /var/www/html/vendor
+    depends_on:
+      - mysql
+
+  mysql:
+    image: mysql
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    ports:
+      - '3306:3306'
+    environment:
+      MYSQL_DATABASE: db_example
+      MYSQL_USER: db_user
+      MYSQL_PASSWORD: dbpassword
+      MYSQL_ROOT_PASSWORD: dbpassword
+    volumes:
+      - ./dbdata:/var/lib/mysql
+
+  phpmyadmin:
+    image: phpmyadmin
+    restart: always
+    depends_on:
+      - mysql
+    ports:
+      - '9001:80'
+    environment:
+      PMA_HOST: mysql
+
